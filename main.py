@@ -39,8 +39,12 @@ class Tri_learner:
         fn = font.Font(size=22, weight='normal')
         Label(self.sidebar, font=fn, text='x = ', anchor='e').grid(
             sticky=NSEW, column=0, row=0)
-        self.x_value = Label(self.sidebar, font=fn, text='0', anchor='w').grid(
+
+        self.x_value = StringVar()
+        self.x_value.set('0')
+        Label(self.sidebar, font=fn, textvariable=self.x_value, anchor='w').grid(
             sticky=NSEW, column=1, row=0)
+
         Label(self.sidebar, font=fn, text='sin(x) = ', anchor='e').grid(
             sticky=NSEW, column=0, row=1)
         self.sin_value = Label(self.sidebar, font=fn, text='0', anchor='w').grid(
@@ -81,9 +85,15 @@ class Tri_learner:
         self.dots = []
         dots_li = [0, pi/6, pi/4, pi/3, pi/2, 2*pi/3, 3*pi/4, 5*pi/6,
                    pi, 7*pi/6, 5*pi/4, 4*pi/3, 3*pi/2, 5*pi/3, 7*pi/4, 11*pi/6]
-        for rad_val in dots_li:
+        dots_repr = ['0', 'π/6', 'π/4', 'π/3',
+                     'π/2', '2π/3', '3π/4', '5π/6', 'π', '7π/6', '5π/4', '4π/3', '3π/2', '5π/3', '7π/4', '11π/6', '0']
+        actual_rads = dots_li[:]
+        actual_rads.reverse()
+        actual_rads.insert(0, 0)
+        dots_repr.reverse()
+        for num, rad_val in enumerate(dots_li):
             new_dot = UnitDot(self.cnv, rad_val, 7, self.radius,
-                              self.center_coord['x'], self.center_coord['y'], color='tomato')
+                              self.center_coord['x'], self.center_coord['y'], actual_rads[num], color='tomato', label=dots_repr[num])
             self.dots.append(new_dot)
             self.cnv.tag_bind(new_dot.own_id, '<Button-1>',
                               lambda event, new_dot=new_dot: self.on_dot_clicked(new_dot))
@@ -92,6 +102,8 @@ class Tri_learner:
         for i in self.dots:
             i.set_unselected()
         dot.set_selected()
+        self.active_dot = dot
+        self.x_value.set(self.active_dot.label)
 
     def draw_circle(self, x, y, r=3):
         x1 = x - r
@@ -100,14 +112,14 @@ class Tri_learner:
         y2 = y + r
         self.cnv.create_oval(x1, y1, x2, y2, fill='red')
 
-    @property
+    @ property
     def center_coord(self):
         self.root.update_idletasks()
         x = self.cnv.winfo_width() / 2
         y = self.cnv.winfo_height() / 2
         return {'x': x, 'y': y}
 
-    @property
+    @ property
     def max_coord(self):
         self.root.update_idletasks()
         x = self.cnv.winfo_width()

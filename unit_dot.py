@@ -3,7 +3,7 @@ from math import *
 
 
 class UnitDot:
-    def __init__(self, cnv, rad_val, own_radius, circle_radius, center_x, center_y, color='green', active_color='red'):
+    def __init__(self, cnv, rad_val, own_radius, circle_radius, center_x, center_y, actual_rad_value, color='green', active_color='red', label='π'):
         self.cnv = cnv
         self.rad_val = rad_val
         self.own_radius = own_radius
@@ -13,8 +13,10 @@ class UnitDot:
         self.is_active = False
         self.color = color
         self.active_color = active_color
+        self.label = label
         self.x = self.circle_radius * cos(self.rad_val) + self.center_x
         self.y = self.circle_radius * sin(self.rad_val) + self.center_y
+        self.actual_rad_value = actual_rad_value
         self.own_id = self.draw_circle()
 
     def draw_circle(self):
@@ -42,6 +44,7 @@ class UnitDot:
     def set_selected(self):
         self.is_active = True
         self.cnv.itemconfig(self.own_id, fill=self.active_color)
+        print(self.actual_rad_value)
 
     def set_unselected(self):
         self.is_active = False
