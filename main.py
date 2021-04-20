@@ -85,9 +85,9 @@ class Tri_learner:
         self.units = self.cnv.create_oval(
             x1, y1, x2, y2, fill=None, outline='DarkOrchid4', width=self.line_width)
         self.x_axis = self.cnv.create_line(
-            0, self.center_coord['y'], self.max_coord['x'], self.center_coord['y'], width=self.line_width, fill='OrangeRed2')
+            0, self.center_coord['y'], self.max_coord['x'], self.center_coord['y'], width=self.line_width, fill='OrangeRed2', arrow=LAST)
         self.y_axis = self.cnv.create_line(
-            self.center_coord['x'], 0, self.center_coord['x'], self.max_coord['y'], width=self.line_width, fill='OrangeRed2')
+            self.center_coord['x'], 0, self.center_coord['x'], self.max_coord['y'], width=self.line_width, fill='OrangeRed2', arrow=FIRST)
 
         self.y_axis_label = self.cnv.create_text(
             self.center_coord['x'] + 20, 20, text='Y', font="Times 20 italic bold")
