@@ -1,18 +1,23 @@
 from tkinter import *
+from tkinter.ttk import *
+import tkinter.font as font
+from math import *
+
+from unit_dot import UnitDot
 
 
 class Tri_learner:
     def __init__(self):
         self.root = Tk()
         self.root.geometry('600x500+100+100')
+        self.radius = 150
         self.create_gui()
         self.root.bind('<Configure>', self.update_canvas)
-        self.cnt = 0
         self.root.mainloop()
 
     def create_gui(self):
         self.cnv = Canvas(self.root)
-        self.cnv.configure(background='white')
+        self.cnv.configure(background='light cyan')
         self.line_width = 3
         self.root.grid_columnconfigure(0, weight=1)
         self.root.grid_columnconfigure(1, weight=1)
@@ -21,30 +26,69 @@ class Tri_learner:
         self.root.grid_rowconfigure(0, weight=1)
         self.cnv.grid(column=0, row=0, columnspan=3, rowspan=3, sticky=NSEW)
         self.create_units()
-        self.create_btns()
+        self.draw_dots()
+        self.create_info()
 
-    def create_btns(self):
+    def create_info(self):
         self.sidebar = Frame(self.root)
-        Label(self.sidebar, text='sin(x)').grid()
-        Label(self.sidebar, text='cos(x)').grid()
-        Label(self.sidebar, text='tg(x)').grid()
-        Label(self.sidebar, text='ctg(x)').grid()
+        self.sidebar.grid_columnconfigure(0, weight=1)
+        self.sidebar.grid_columnconfigure(1, weight=1)
+        fn = font.Font(size=22, weight='normal')
+        Label(self.sidebar, font=fn, text='x = ', anchor='e').grid(
+            sticky=NSEW, column=0, row=0)
+        self.x_value = Label(self.sidebar, font=fn, text='0', anchor='w').grid(
+            sticky=NSEW, column=1, row=0)
+        Label(self.sidebar, font=fn, text='sin(x) = ', anchor='e').grid(
+            sticky=NSEW, column=0, row=1)
+        self.sin_value = Label(self.sidebar, font=fn, text='0', anchor='w').grid(
+            sticky=NSEW, column=1, row=1)
+        Label(self.sidebar, font=fn, text='cos(x) = ', anchor='e').grid(
+            sticky=NSEW, column=0, row=2)
+        self.cos_value = Label(self.sidebar, font=fn, text='1', anchor='w').grid(
+            sticky=NSEW, column=1, row=2)
+        Label(self.sidebar, font=fn, text='tg(x) = ', anchor='e').grid(
+            sticky=NSEW, column=0, row=3)
+        self.tg_value = Label(self.sidebar, font=fn, text='0', anchor='w').grid(
+            sticky=NSEW, column=1, row=3)
+        Label(self.sidebar, font=fn, text='ctg(x) = ', anchor='e').grid(
+            sticky=NSEW, column=0, row=4)
+        self.ctg_value = Label(self.sidebar, font=fn, text='-', anchor='w').grid(
+            sticky=NSEW, column=1, row=4)
         self.sidebar.grid(column=3, row=0, columnspan=1,
                           rowspan=3, sticky=NSEW)
 
     def create_units(self):
-        radius = 150
-        x1 = self.center_coord['x'] - radius
-        x2 = self.center_coord['x'] + radius
-        y1 = self.center_coord['y'] - radius
-        y2 = self.center_coord['y'] + radius
-        print(self.center_coord)
+        x1 = self.center_coord['x'] - self.radius
+        x2 = self.center_coord['x'] + self.radius
+        y1 = self.center_coord['y'] - self.radius
+        y2 = self.center_coord['y'] + self.radius
         self.units = self.cnv.create_oval(
-            x1, y1, x2, y2, fill=None, width=self.line_width)
+            x1, y1, x2, y2, fill=None, outline='DarkOrchid4', width=self.line_width)
         self.x_axis = self.cnv.create_line(
-            0, self.center_coord['y'], self.max_coord['x'], self.center_coord['y'], width=self.line_width)
+            0, self.center_coord['y'], self.max_coord['x'], self.center_coord['y'], width=self.line_width, fill='OrangeRed2')
         self.y_axis = self.cnv.create_line(
-            self.center_coord['x'], 0, self.center_coord['x'], self.max_coord['y'], width=self.line_width)
+            self.center_coord['x'], 0, self.center_coord['x'], self.max_coord['y'], width=self.line_width, fill='OrangeRed2')
+
+        self.y_axis_label = self.cnv.create_text(
+            self.center_coord['x'] + 20, 20, text='Y', font="Times 20 italic bold")
+        self.x_axis_label = self.cnv.create_text(
+            self.max_coord['x'] - 50, self.center_coord['y'] - 20, text='X', font="Times 20 italic bold")
+
+    def draw_dots(self):
+        self.dots = []
+        dots_li = [0, pi/6, pi/4, pi/3, pi/2, 2*pi/3, 3*pi/4, 5*pi/6,
+                   pi, 7*pi/6, 5*pi/4, 4*pi/3, 3*pi/2, 5*pi/3, 7*pi/4, 11*pi/6]
+        for rad_val in dots_li:
+            new_dot = UnitDot(self.cnv, rad_val, 5, self.radius,
+                              self.center_coord['x'], self.center_coord['y'], color='tomato')
+            self.dots.append(new_dot)
+
+    def draw_circle(self, x, y, r=3):
+        x1 = x - r
+        x2 = x + r
+        y1 = y - r
+        y2 = y + r
+        self.cnv.create_oval(x1, y1, x2, y2, fill='red')
 
     @property
     def center_coord(self):
@@ -60,21 +104,47 @@ class Tri_learner:
         y = self.cnv.winfo_height()
         return {'x': x, 'y': y}
 
-    def update_canvas(self, event):
-        self.cnt += 1
-        print(f'update {self.cnt}')
+    @property
+    def dots_coords(self):
+        dots_li = [0, pi/6, pi/4, pi/3, pi/2, 2*pi/3, 3*pi/4, 5*pi/6,
+                   pi, 7*pi/6, 5*pi/4, 4*pi/3, 3*pi/2, 5*pi/3, 7*pi/4, 11*pi/6]
+        coords = []
+        for dot in dots_li:
+            var = ((self.radius * cos(dot) +
+                    self.center_coord['x'], self.radius * sin(dot) + self.center_coord['y']))
+            coords.append(var)
 
-        radius = 150
-        x1 = self.center_coord['x'] - radius
-        x2 = self.center_coord['x'] + radius
-        y1 = self.center_coord['y'] - radius
-        y2 = self.center_coord['y'] + radius
+        return dict(zip(dots_li, coords))
+
+    def update_canvas(self, event):
+        self.radius = min(self.max_coord['x'], self.max_coord['y']) / 4
+
+        # update units circle
+        x1 = self.center_coord['x'] - self.radius
+        x2 = self.center_coord['x'] + self.radius
+        y1 = self.center_coord['y'] - self.radius
+        y2 = self.center_coord['y'] + self.radius
         self.cnv.coords(self.units, x1, y1, x2, y2)
 
+        # update x and y axises
         self.cnv.coords(self.x_axis,
                         0, self.center_coord['y'], self.max_coord['x'], self.center_coord['y'])
         self.cnv.coords(self.y_axis,
                         self.center_coord['x'], 0, self.center_coord['x'], self.max_coord['y'])
+
+        # update x and y labels
+        self.cnv.coords(self.y_axis_label,
+                        self.center_coord['x'] + 20, 20)
+        self.cnv.coords(self.x_axis_label,
+                        self.max_coord['x'] - 50, self.center_coord['y'] - 20)
+
+        # update dots
+        dots_li = [0, pi/6, pi/4, pi/3, pi/2, 2*pi/3, 3*pi/4, 5*pi/6,
+                   pi, 7*pi/6, 5*pi/4, 4*pi/3, 3*pi/2, 5*pi/3, 7*pi/4, 11*pi/6]
+        # TODO: fix this shit or make window unchnageble
+        for dot in self.dots:
+            dot.update_coord(
+                self.radius, self.center_coord['x'], self.center_coord['y'])
 
 
 if __name__ == "__main__":
