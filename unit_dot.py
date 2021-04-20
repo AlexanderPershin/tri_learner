@@ -44,8 +44,25 @@ class UnitDot:
     def set_selected(self):
         self.is_active = True
         self.cnv.itemconfig(self.own_id, fill=self.active_color)
-        print(self.actual_rad_value)
 
     def set_unselected(self):
         self.is_active = False
         self.cnv.itemconfig(self.own_id, fill=self.color)
+
+    def get_sin(self):
+        return round(sin(self.actual_rad_value), 2)
+
+    def get_cos(self):
+        return round(cos(self.actual_rad_value), 2)
+
+    def get_tg(self):
+        if self.get_cos() != 0:
+            return round((self.get_sin()/self.get_cos()), 2)
+        else:
+            return 100
+
+    def get_ctg(self):
+        if self.get_sin() != 0:
+            return round((self.get_cos()/self.get_sin()), 2)
+        else:
+            return 100

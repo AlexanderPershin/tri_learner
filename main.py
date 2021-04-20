@@ -37,30 +37,43 @@ class Tri_learner:
         self.sidebar.grid_columnconfigure(0, weight=1)
         self.sidebar.grid_columnconfigure(1, weight=1)
         fn = font.Font(size=22, weight='normal')
+
         Label(self.sidebar, font=fn, text='x = ', anchor='e').grid(
             sticky=NSEW, column=0, row=0)
-
         self.x_value = StringVar()
         self.x_value.set('0')
-        Label(self.sidebar, font=fn, textvariable=self.x_value, anchor='w').grid(
+        Label(self.sidebar, font=fn, textvariable=self.x_value, anchor='w', width=6).grid(
             sticky=NSEW, column=1, row=0)
 
         Label(self.sidebar, font=fn, text='sin(x) = ', anchor='e').grid(
             sticky=NSEW, column=0, row=1)
-        self.sin_value = Label(self.sidebar, font=fn, text='0', anchor='w').grid(
+
+        self.sin_value = StringVar()
+        self.sin_value.set('0')
+        Label(self.sidebar, font=fn, textvariable=self.sin_value, anchor='w').grid(
             sticky=NSEW, column=1, row=1)
+
         Label(self.sidebar, font=fn, text='cos(x) = ', anchor='e').grid(
             sticky=NSEW, column=0, row=2)
-        self.cos_value = Label(self.sidebar, font=fn, text='1', anchor='w').grid(
+        self.cos_value = StringVar()
+        self.cos_value.set('1')
+        Label(self.sidebar, font=fn, textvariable=self.cos_value, anchor='w').grid(
             sticky=NSEW, column=1, row=2)
+
         Label(self.sidebar, font=fn, text='tg(x) = ', anchor='e').grid(
             sticky=NSEW, column=0, row=3)
-        self.tg_value = Label(self.sidebar, font=fn, text='0', anchor='w').grid(
+        self.tg_value = StringVar()
+        self.tg_value.set('0')
+        Label(self.sidebar, font=fn, textvariable=self.tg_value, anchor='w').grid(
             sticky=NSEW, column=1, row=3)
+
         Label(self.sidebar, font=fn, text='ctg(x) = ', anchor='e').grid(
             sticky=NSEW, column=0, row=4)
-        self.ctg_value = Label(self.sidebar, font=fn, text='-', anchor='w').grid(
+        self.ctg_value = StringVar()
+        self.ctg_value.set('-')
+        Label(self.sidebar, font=fn, textvariable=self.ctg_value, anchor='w').grid(
             sticky=NSEW, column=1, row=4)
+
         self.sidebar.grid(column=3, row=0, columnspan=1,
                           rowspan=3, sticky=NSEW)
 
@@ -98,12 +111,28 @@ class Tri_learner:
             self.cnv.tag_bind(new_dot.own_id, '<Button-1>',
                               lambda event, new_dot=new_dot: self.on_dot_clicked(new_dot))
 
+        self.dots[0].set_selected()
+
     def on_dot_clicked(self, dot):
         for i in self.dots:
             i.set_unselected()
         dot.set_selected()
         self.active_dot = dot
-        self.x_value.set(self.active_dot.label)
+        self.x_value.set(dot.label)
+        self.sin_value.set(self.map_to_fracture(self.active_dot.get_sin()))
+        self.cos_value.set(self.map_to_fracture(self.active_dot.get_cos()))
+        self.tg_value.set(self.map_to_fracture(self.active_dot.get_tg()))
+        self.ctg_value.set(self.map_to_fracture(self.active_dot.get_ctg()))
+        self.map_to_fracture(self.active_dot.get_sin())
+
+    def map_to_fracture(self, val):
+        vals = {0.5: '1/2', 0.87: '√3/2',
+                0.57: '√3/3', 1.74: '√3', 0.71: '√2/2', 1.0: '1', 0: '0', 100: '-'}
+        is_negative = val < 0
+        if is_negative:
+            return f'-{vals.get(abs(val))}'
+        else:
+            return f'{vals.get(abs(val))}'
 
     def draw_circle(self, x, y, r=3):
         x1 = x - r
