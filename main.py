@@ -11,6 +11,9 @@ class Tri_learner:
         self.root = Tk()
         self.root.geometry('600x500+100+100')
         self.radius = 150
+        self.dots_rads = [0, pi/6, pi/4, pi/3, pi/2, 2*pi/3, 3*pi/4, 5*pi/6,
+                          pi, 7*pi/6, 5*pi/4, 4*pi/3, 3*pi/2, 5*pi/3, 7*pi/4, 11*pi/6]
+        self.active_dot = None
         self.create_gui()
         self.root.bind('<Configure>', self.update_canvas)
         self.root.mainloop()
@@ -79,9 +82,16 @@ class Tri_learner:
         dots_li = [0, pi/6, pi/4, pi/3, pi/2, 2*pi/3, 3*pi/4, 5*pi/6,
                    pi, 7*pi/6, 5*pi/4, 4*pi/3, 3*pi/2, 5*pi/3, 7*pi/4, 11*pi/6]
         for rad_val in dots_li:
-            new_dot = UnitDot(self.cnv, rad_val, 5, self.radius,
+            new_dot = UnitDot(self.cnv, rad_val, 7, self.radius,
                               self.center_coord['x'], self.center_coord['y'], color='tomato')
             self.dots.append(new_dot)
+            self.cnv.tag_bind(new_dot.own_id, '<Button-1>',
+                              lambda event, new_dot=new_dot: self.on_dot_clicked(new_dot))
+
+    def on_dot_clicked(self, dot):
+        for i in self.dots:
+            i.set_unselected()
+        dot.set_selected()
 
     def draw_circle(self, x, y, r=3):
         x1 = x - r
@@ -103,18 +113,7 @@ class Tri_learner:
         x = self.cnv.winfo_width()
         y = self.cnv.winfo_height()
         return {'x': x, 'y': y}
-
-    @property
-    def dots_coords(self):
-        dots_li = [0, pi/6, pi/4, pi/3, pi/2, 2*pi/3, 3*pi/4, 5*pi/6,
-                   pi, 7*pi/6, 5*pi/4, 4*pi/3, 3*pi/2, 5*pi/3, 7*pi/4, 11*pi/6]
-        coords = []
-        for dot in dots_li:
-            var = ((self.radius * cos(dot) +
-                    self.center_coord['x'], self.radius * sin(dot) + self.center_coord['y']))
-            coords.append(var)
-
-        return dict(zip(dots_li, coords))
+        return dots_li
 
     def update_canvas(self, event):
         self.radius = min(self.max_coord['x'], self.max_coord['y']) / 4
@@ -139,9 +138,6 @@ class Tri_learner:
                         self.max_coord['x'] - 50, self.center_coord['y'] - 20)
 
         # update dots
-        dots_li = [0, pi/6, pi/4, pi/3, pi/2, 2*pi/3, 3*pi/4, 5*pi/6,
-                   pi, 7*pi/6, 5*pi/4, 4*pi/3, 3*pi/2, 5*pi/3, 7*pi/4, 11*pi/6]
-        # TODO: fix this shit or make window unchnageble
         for dot in self.dots:
             dot.update_coord(
                 self.radius, self.center_coord['x'], self.center_coord['y'])
